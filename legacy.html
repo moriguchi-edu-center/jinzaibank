@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>現行の計画・報告書を読み込む</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img class="seal" src="logo/人材バンクLogo.png" alt="守口市教育委員会の人材バンクのロゴ">
+      <div>
+        <h1>現行の計画・報告書を読み込む</h1>
+        <p>守口市社会人等人材バンク　教育センターでの移行作業</p>
+      </div>
+    </div>
+  </header>
+  <main class="wrap">
+    <section class="panel">
+      <h2>エクセルを開く</h2>
+      <p class="lead">いま学校が使っている計画・報告書の入ったフォルダを開きます。中のエクセルを、下のフォルダも含めてすべて読みます。読み込んだあと、取り込む年月と、書き出す行を選べます。シートが複数あるときは、入力のあるシートごとに取り出します。このページは学校の入力画面とは別です。教頭先生へ渡すときも、このフォルダごと渡して、このページだけを開いてもらいます。</p>
+      <label class="field">計画・報告書の入ったフォルダ<input id="legacy-folder" type="file" webkitdirectory directory multiple></label>
+      <p id="legacy-status" class="small"></p>
+      <p class="small">ひな形と違うところは、下に出します。行を増やしていても、合計の行の手前まで取ります。非表示の行や、日付・時刻が揃っていない行も読み込みます。</p>
+    </section>
+    <div id="app"></div>
+  </main>
+  <script src="js/core.js"></script>
+  <script src="js/xlsx.full.min.js"></script>
+  <script src="js/legacy.js"></script>
+</body>
+</html>

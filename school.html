@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>守口市社会人等人材バンク　活用計画・実績報告</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <img class="seal" src="logo/人材バンクLogo.png" alt="守口市教育委員会の人材バンクのロゴ">
+      <div>
+        <h1>守口市社会人等人材バンク　活用計画・実績報告</h1>
+        <p id="school-caption">守口市社会人等指導者人材バンク</p>
+      </div>
+    </div>
+    <div class="header-links">
+      <span id="state-note" class="state-note" role="status"></span>
+      <button type="button" class="btn" data-action="save-state">現在の作業状態を保存</button>
+    </div>
+  </header>
+  <main class="wrap">
+    <div id="role-bar"></div>
+    <nav class="tabs" id="tabs"></nav>
+    <p id="role-note" class="role-note"></p>
+    <div id="app"></div>
+  </main>
+  <script src="js/core.js"></script>
+  <script src="js/xlsx.full.min.js"></script>
+  <script src="js/school.js"></script>
+</body>
+</html>
