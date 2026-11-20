@@ -251,7 +251,6 @@
     if (doc) list.push(doc);
     (others || []).forEach(function (item) {
       if (!item || (doc && item.id === doc.id)) return;
-      if (doc && doc.type && item.type !== doc.type) return;
       var itemKey = String(item.instructorId || "").trim() || String(item.instructorName || "").trim();
       if (key && itemKey === key) list.push(item);
     });
