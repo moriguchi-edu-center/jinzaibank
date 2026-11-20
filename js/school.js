@@ -763,8 +763,15 @@
       alert("保存する計画・報告がありません。");
       return;
     }
+    var label = prompt("下のファイル名の「〇〇」に入る言葉を入力してください。\n" + workFileName("〇〇"));
+    if (label == null) return;
+    label = safeFilePart(label);
+    if (!label) {
+      alert("ファイル名の「〇〇」に入る言葉を入力してください。");
+      return;
+    }
     save();
-    J.downloadExcel(workFileName(), J.handoffWorkbook(handoffPayload("work", documents)));
+    J.downloadExcel(workFileName(label), J.handoffWorkbook(handoffPayload("work", documents)));
     var note = document.getElementById("state-note");
     if (note) note.textContent = "保存しました。";
   }
@@ -806,10 +813,13 @@
     return copy;
   }
 
-  function workFileName(year, month) {
-    var y = year == null ? filter.year : year;
-    var m = month == null ? filter.month : month;
-    return J.wareki(y, m) + "作業ファイル_" + fileSchoolName() + ".xlsx";
+  function workFileStamp() {
+    var parts = J.todayISO().split("-");
+    return parts[0].slice(-2) + parts[1] + parts[2];
+  }
+
+  function workFileName(label) {
+    return workFileStamp() + "作業ファイル_" + fileSchoolName() + "_" + safeFilePart(label) + ".xlsx";
   }
 
   function nextMonthOf(year, month) {
@@ -898,22 +908,16 @@
       alert(month + "月の活用計画がありません。");
       return;
     }
+    state.documents.forEach(function (doc) {
+      if (Number(doc.year) === year && Number(doc.month) === month) {
+        doc.wip = false;
+        doc.updatedAt = new Date().toISOString();
+      }
+    });
     var next = nextMonthOf(year, month);
     var fromLabel = J.wareki(year, month);
     var toLabel = J.wareki(next.year, next.month);
-    var fileName = workFileName(year, month);
-    var fileStem = fileName.replace(/\.xlsx$/, "");
-    var saved = confirm("保存しますか？\n" + fileStem + "\n\nこのあと、" + fromLabel + "の実績報告を消し、活用計画を" + toLabel + "にします。\nOKで保存してから進めます。キャンセルでは保存せずに進めます。");
-    if (saved) {
-      var monthDocs = state.documents.filter(function (doc) {
-        return Number(doc.year) === year && Number(doc.month) === month;
-      }).map(publishCopy);
-      J.downloadExcel(fileName, J.handoffWorkbook(handoffPayload("work", monthDocs)));
-    }
-    state.documents = state.documents.filter(function (doc) {
-      return !(doc.type === "report" && Number(doc.year) === year && Number(doc.month) === month);
-    }).map(function (doc) {
-      if (!(doc.type === "plan" && Number(doc.year) === year && Number(doc.month) === month)) return doc;
+    var copies = plans.map(function (doc) {
       var copy = JSON.parse(JSON.stringify(doc));
       copy.id = J.uid();
       copy.year = next.year;
@@ -921,18 +925,17 @@
       copy.preparedOn = J.todayISO();
       copy.updatedAt = new Date().toISOString();
       shiftPlanSessions(copy.sessions, next.year, next.month);
-      copy.wip = J.validateDocument(copy).length > 0;
+      copy.wip = false;
       return copy;
     });
+    state.documents = state.documents.concat(copies);
     filter.year = next.year;
     filter.month = next.month;
     filter.type = "all";
     draft = null;
     submitPreview = null;
     pickedSubmit = {};
-    var text = toLabel + "の活用計画にしました。" + fromLabel + "の実績報告は消しています。";
-    if (saved) text += fileName.replace(/\.xlsx$/, "") + "を保存しました。";
-    formMessage = { type: "ok", place: "list", text: text };
+    formMessage = { type: "ok", place: "list", text: toLabel + "の活用計画を作り、帳票を保存しました。" + fromLabel + "の計画と実績報告も残しています。" };
     state.tab = "docs";
     save();
     render();
@@ -1075,7 +1078,7 @@
     }
     var incoming = json.documents.filter(function (doc) { return doc && (doc.type === "plan" || doc.type === "report"); }).map(function (doc) {
       if (!doc.id) doc.id = J.uid();
-      doc.wip = J.validateDocument(doc).length > 0;
+      doc.wip = json.handoff === "work" ? false : J.validateDocument(doc).length > 0;
       delete doc.schoolName;
       return doc;
     });
